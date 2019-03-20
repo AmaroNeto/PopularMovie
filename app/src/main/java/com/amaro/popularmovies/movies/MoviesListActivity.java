@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +12,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.amaro.popularmovies.R;
+import com.amaro.popularmovies.movies.async.AsyncTaskDelegate;
+import com.amaro.popularmovies.movies.async.FetchMoviesTask;
 import com.amaro.popularmovies.utilities.NetworkUtils;
 
 import org.json.JSONArray;
@@ -27,12 +30,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MoviesListActivity extends AppCompatActivity implements MoviesListAdapter.ListItemClickListener {
+public class MoviesListActivity extends AppCompatActivity implements MoviesListAdapter.ListItemClickListener,
+        AsyncTaskDelegate {
 
     private ProgressBar mProgressBar;
     private RecyclerView mMoviesListRecycleView;
     private List<Movie> mMovies;
 
+    private static final String POPULAR = "popular";
     private final static int NUMBER_OfColumns = 2;
 
     @Override
@@ -43,7 +48,7 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesListA
         bindViewComponents();
         configMoviesListRecycleView();
 
-        loadData("popular");
+        loadData(POPULAR);
     }
 
     private void bindViewComponents() {
@@ -63,8 +68,11 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesListA
             return;
         }
 
+        showProgressbar(true);
+        showRecycleView(false);
+
         URL listMoviesUrl = NetworkUtils.getPopularMoviesURL(sortBy);
-        new FetchMoviesTask().execute(listMoviesUrl);
+        new FetchMoviesTask(this).execute(listMoviesUrl);
     }
 
     private void showProgressbar(boolean show) {
@@ -116,57 +124,35 @@ public class MoviesListActivity extends AppCompatActivity implements MoviesListA
         startActivity(intent);
     }
 
-    class FetchMoviesTask extends AsyncTask<URL, Void, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressbar(true);
-            showRecycleView(false);
-        }
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            URL moviesUrl = urls[0];
-            String moviesResults = null;
+    @Override
+    public void processFinish(Object output) {
+        if(output != null && !TextUtils.isEmpty((String) output)) {
             try {
-                moviesResults = NetworkUtils.getResponseFromHttpUrl(moviesUrl);
-            } catch (IOException e) {
+                JSONObject mbMovieList = new JSONObject((String) output);
+                JSONArray result = mbMovieList.getJSONArray("results");
+
+                List<Movie> moviesArray = new ArrayList<Movie>();
+
+                for(int i = 0; i < result.length(); i++) {
+                    JSONObject movieJson = result.getJSONObject(i);
+                    Movie movie = new Movie();
+                    movie.setTitle(movieJson.getString("original_title"));
+                    movie.setOverview(movieJson.getString("overview"));
+                    movie.setPosterUrl(movieJson.getString("poster_path"));
+                    movie.setReleaseDate(movieJson.getString("release_date"));
+                    movie.setVoteAverage(movieJson.getDouble("vote_average"));
+
+                    moviesArray.add(movie);
+                }
+
+                setRecycleViewData(moviesArray);
+
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return moviesResults;
         }
 
-        @Override
-        protected void onPostExecute(String s) {
-            if(!TextUtils.isEmpty(s)) {
-                try {
-                    JSONObject mbMovieList = new JSONObject(s);
-                    JSONArray result = mbMovieList.getJSONArray("results");
-
-                    List<Movie> moviesArray = new ArrayList<Movie>();
-
-                    for(int i = 0; i < result.length(); i++) {
-                        JSONObject movieJson = result.getJSONObject(i);
-                        Movie movie = new Movie();
-                        movie.setTitle(movieJson.getString("original_title"));
-                        movie.setOverview(movieJson.getString("overview"));
-                        movie.setPosterUrl(movieJson.getString("poster_path"));
-                        movie.setReleaseDate(movieJson.getString("release_date"));
-                        movie.setVoteAverage(movieJson.getDouble("vote_average"));
-
-                        moviesArray.add(movie);
-                    }
-
-                    setRecycleViewData(moviesArray);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            showProgressbar(false);
-            showRecycleView(true);
-        }
+        showProgressbar(false);
+        showRecycleView(true);
     }
 }
