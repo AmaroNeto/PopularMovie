@@ -6,8 +6,6 @@ import android.app.Application;
 import com.amaro.popularmovies.data.AppDatabase;
 import com.amaro.popularmovies.data.MovieRepository;
 import com.amaro.popularmovies.data.movie.MovieModel;
-import com.amaro.popularmovies.model.MovieLiveData;
-import com.amaro.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
 import java.util.List;

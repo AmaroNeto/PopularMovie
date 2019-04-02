@@ -6,13 +6,8 @@ import android.os.AsyncTask;
 import com.amaro.popularmovies.data.movie.MovieDao;
 import com.amaro.popularmovies.data.movie.MovieModel;
 import com.amaro.popularmovies.data.review.ReviewDao;
-import com.amaro.popularmovies.data.review.ReviewModel;
 import com.amaro.popularmovies.data.trailer.TrailerDao;
-import com.amaro.popularmovies.data.trailer.TrailerModel;
-import com.amaro.popularmovies.utilities.NetworkUtils;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -45,6 +40,10 @@ public class MovieRepository {
 
     public LiveData<List<MovieModel>> loadAllMovies() {
         return mMovieDao.loadAllMovies();
+    }
+
+    public MovieModel findMovieById(int id) {
+        return mMovieDao.findMovieById(id);
     }
 
     public void insertMovie(MovieModel movie) {

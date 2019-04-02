@@ -1,7 +1,9 @@
 package com.amaro.popularmovies.view;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +30,7 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -72,7 +75,8 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
 
         if(mMovie != null) {
             loadData();
-            configFavoriteButton();
+            mBtFavorite.setEnabled(false);
+            configFavoriteButton(mMovie.getId());
 
             showTrailerProgressbar(true);
             showTrailerRecycleView(false);
@@ -105,21 +109,35 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
         mReviewRecyclerView.setHasFixedSize(true);
     }
 
-    private void configFavoriteButton() {
-        mBtFavorite.setChecked(mMovie.isFavorite());
-        mBtFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+    private void configFavoriteButton(int id) {
+        new AsyncTask<Context, Void, Boolean>() {
+
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                if(isChecked) {
-                    mMovie.setFavorite(true);
-                    repository.insertMovie(mMovie);
-                } else {
-                    repository.deleteMovie(mMovie);
-                }
-
+            protected Boolean doInBackground(Context... contexts) {
+                MovieModel movie = repository.findMovieById(id);
+                return new Boolean(movie != null);
             }
-        });
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                mBtFavorite.setChecked(aBoolean);
+                mBtFavorite.setEnabled(true);
+                mBtFavorite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                        if(isChecked) {
+                            mMovie.setFavorite(true);
+                            repository.insertMovie(mMovie);
+                        } else {
+                            repository.deleteMovie(mMovie);
+                        }
+
+                    }
+                });
+            }
+        }.execute(this);
     }
 
     private void setRecycleViewTrailer(List<TrailerModel> trailers) {

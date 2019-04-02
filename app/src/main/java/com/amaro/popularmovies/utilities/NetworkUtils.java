@@ -5,18 +5,18 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 
+import com.amaro.popularmovies.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-
-import java.net.URI;
 import java.net.URL;
 import java.util.Scanner;
 
 public class NetworkUtils {
 
-    final static String API_KEY = "####YOUR-API-KEY####";
+    final static String API_KEY = BuildConfig.API_KEY;
     final static String MOVIEDB_BASE_URL =
             "http://api.themoviedb.org/3/movie/";
     final static String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w185/";
