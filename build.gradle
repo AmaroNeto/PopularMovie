@@ -5,7 +5,12 @@ buildscript {
     ext.versions = [
             'androidx' : '1.0.0',
             'picasso' : '2.71828',
+<<<<<<< HEAD
             'constraint' : '1.1.3'
+=======
+            'constraint' : '1.1.3',
+            'lifecycle' : '2.1.0-alpha03'
+>>>>>>> Nanodegree stage 2
     ]
 
     repositories {
@@ -14,7 +19,7 @@ buildscript {
         
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath 'com.android.tools.build:gradle:3.3.2'
         
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

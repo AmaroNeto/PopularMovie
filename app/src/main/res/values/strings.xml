@@ -4,4 +4,8 @@
     <string name="popular">Popular</string>
     <string name="network_error">Please, check your network connection!</string>
     <string name="poster_movie">Movie Poster</string>
+    <string name="favorites">Favorites</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
+    <string name="youtube_error">Error when try start youtube.</string>
 </resources>

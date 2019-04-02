@@ -9,6 +9,16 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
+
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {
@@ -25,6 +35,13 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.androidx}"
     implementation "androidx.recyclerview:recyclerview:${versions.androidx}"
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraint}"
+
+    implementation "androidx.lifecycle:lifecycle-extensions:${versions.lifecycle}"
+    implementation "androidx.lifecycle:lifecycle-compiler:${versions.lifecycle}"
+    implementation "androidx.lifecycle:lifecycle-runtime:${versions.lifecycle}"
+    implementation "androidx.room:room-runtime:${versions.lifecycle}"
+    implementation "androidx.room:room-migration:${versions.lifecycle}"
+    implementation "androidx.room:room-compiler:${versions.lifecycle}"
 
     //Picasso
     implementation "com.squareup.picasso:picasso:${versions.picasso}"
